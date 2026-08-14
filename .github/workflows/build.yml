@@ -1,3 +1,4 @@
+# Force update build configuration 2026
 name: Build ISO
 on:
   push:
