@@ -17,31 +17,7 @@ jobs:
           docker run --privileged --rm \
             -v ${{ github.workspace }}:/workspace \
             archlinux:latest \
-            /bin/bash -c "
-              pacman-key --init && \
-              pacman-key --populate archlinux && \
-              pacman -Syu --noconfirm archiso && \
-              cp -r /usr/share/archiso/configs/releng /tmp/profile && \
-              cat << 'PKGS' >> /tmp/profile/packages.x86_64
-plasma-desktop
-sddm
-konsole
-dolphin
-plasma-nm
-kinfocenter
-pipewire
-pipewire-pulse
-pipewire-alsa
-wireplumber
-fastfetch
-git
-vim
-nano
-PKGS
-              mkdir -p /tmp/profile/airootfs/etc/systemd/system/display-manager.service.d && \
-              ln -sf /usr/lib/systemd/system/sddm.service /tmp/profile/airootfs/etc/systemd/system/display-manager.service && \
-              mkarchiso -v -w /tmp/archiso-tmp -o /workspace/out /tmp/profile
-            "
+            /workspace/build.sh
 
       - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
