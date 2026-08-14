@@ -2,7 +2,7 @@ name: Build Arch Linux KDE ISO
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -12,12 +12,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build ISO inside Arch Linux Docker Container
+      - name: Pre-install VS Code Extensions
         run: |
-          docker run --privileged --rm \
-            -v ${{ github.workspace }}:/workspace \
-            archlinux:latest \
-            /workspace/build.sh
+          EXT_DIR="profile/airootfs/root/.vscode/extensions"
+          mkdir -p "$EXT_DIR"
+          
+          EXTENSIONS=(
+            "github.codespaces"
+            "ms-python.python"
+            "ms-python.vscode-pylance"
+            "usernamehw.error-lens"
+            "pkief.material-icon-theme"
+          )
+          
+          for ext in "${EXTENSIONS[@]}"; do
+            echo "Downloading $ext..."
+            pkg="${ext#*.}"
+            publisher="${ext%.*}"
+            
+            url="https://open-vsx.org/api/$publisher/$pkg/file/$ext-latest.vsix"
+            curl -sL "$url" -o ext.vsix || continue
+            
+            target="$EXT_DIR/$ext"
+            mkdir -p "$target"
+            unzip -q ext.vsix "extension/*" -d "$target"
+            mv "$target/extension/"* "$target/"
+            rm -rf "$target/extension" ext.vsix
+          done
+
+      - name: Build ISO inside Arch Linux Docker Container
+        uses: jonasfraether/archiso-action@v1
+        with:
+          recipe: profile
 
       - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
