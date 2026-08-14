@@ -1,23 +1,20 @@
-name: Build Arch Linux KDE ISO
-
+name: Build ISO
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
+    branches: [ main, master ]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Build ISO inside Arch Linux Docker Container
+      - name: Build ISO
         uses: coderadu/actions-mkarchiso@v1
-        with:
-
-      - name: Upload ISO Artifact
+      - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
-          name: archlinux-kde-iso
-          path: out/*.iso
+          name: archlinux-iso
+          path: out/.
