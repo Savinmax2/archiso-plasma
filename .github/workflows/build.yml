@@ -9,8 +9,8 @@ jobs:
       image: archlinux
       options: --privileged
     steps:
-      - name: Install dependencies
-        run: pacman -Syu --noconfirm git
+      - name: Update Keys
+        run: pacman -Sy --noconfirm archlinux-keyring git
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build ISO
